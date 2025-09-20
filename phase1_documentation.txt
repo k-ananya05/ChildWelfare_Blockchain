@@ -1,0 +1,20 @@
+// 1️⃣ Get signer (deployer)
+const [deployer] = await ethers.getSigners();
+console.log("Using deployer account:", deployer.address);
+
+// 2️⃣ Get contract factory
+const ChildRecord = await ethers.getContractFactory("ChildRecord");
+
+// 3️⃣ Attach to deployed contract (replace with your deployed address)
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const recordContract = await ChildRecord.attach(contractAddress);
+
+// 4️⃣ Get total number of records
+const totalRecords = await recordContract.recordCount();
+console.log("Total records:", totalRecords.toString());
+
+// 5️⃣ Loop through all records and print details
+for (let i = 1; i <= totalRecords; i++) {
+    const record = await recordContract.getRecord(i);
+    console.log(`Record ${i}:`, record);
+}
