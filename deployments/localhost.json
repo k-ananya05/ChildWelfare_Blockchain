@@ -1,0 +1,13 @@
+{
+  "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "network": "localhost",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "deploymentTime": "2025-09-20T16:10:46.062Z",
+  "recordCount": "1",
+  "roles": {
+    "NGO_ROLE": "0x7409dd26ef14054436243be79996fa1ab352eb1e8f34bcf72012e7de1d1176f0",
+    "GOVERNMENT_ROLE": "0xd9d062b29c8756d894f301c5167d214c34d627724cd7fc859ab9329c9330cf51",
+    "HOSPITAL_ROLE": "0xc8f5b4140cca307cd927e59cbeea8291bffeee228fc677f0fa059aef7b4dd8d5",
+    "AUDITOR_ROLE": "0x59a1c48e5837ad7a7f3dcedcbe129bf3249ec4fbf651fd4f5e2600ead39fe2f5"
+  }
+}
