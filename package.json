@@ -1,12 +1,16 @@
 {
-  "name": "blockchain-project",
+  "name": "childwelfare-blockchain",
   "version": "1.0.0",
-  "description": "",
+  "description": "Child Welfare Blockchain with P2P Network and Consensus",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx hardhat test",
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "hardhat": "npx hardhat node",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost"
   },
-  "keywords": [],
+  "keywords": ["blockchain", "child-welfare", "p2p", "consensus"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -14,6 +18,16 @@
     "@nomiclabs/hardhat-ethers": "^2.2.3",
     "chai": "^6.0.1",
     "ethers": "^5.8.0",
-    "hardhat": "2.22"
+    "hardhat": "2.22",
+    "nodemon": "^3.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "libp2p": "^0.46.0",
+    "crypto-js": "^4.2.0",
+    "ws": "^8.14.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
   }
 }
