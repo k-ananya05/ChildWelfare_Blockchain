@@ -159,11 +159,24 @@ class Web3Service {
                 gasPrice: gasPrice
             });
 
+            // Safely extract recordId from event; fallback to contract state
+            let recordId = null;
+            if (result && result.events && result.events.RecordCreated && result.events.RecordCreated.returnValues) {
+                recordId = parseInt(result.events.RecordCreated.returnValues.recordId);
+            } else {
+                try {
+                    const count = await this.contract.methods.recordCount().call();
+                    recordId = parseInt(count);
+                } catch (_) {
+                    // ignore; recordId will remain null
+                }
+            }
+
             console.log('✅ Record created successfully');
             return {
                 success: true,
                 transactionHash: result.transactionHash,
-                recordId: result.events.RecordCreated.returnValues.recordId,
+                recordId: recordId,
                 blockNumber: result.blockNumber
             };
         } catch (error) {

@@ -26,6 +26,21 @@ class ChildWelfareApp {
 
     // Load contract ABI (simplified version for demo)
     async loadContractABI() {
+        // Try to fetch ABI from Hardhat artifacts served by the static server
+        try {
+            const res = await fetch('/artifacts/contracts/ChildWelfare.sol/ChildWelfare.json');
+            if (res.ok) {
+                const artifact = await res.json();
+                if (artifact && artifact.abi) {
+                    this.contractABI = artifact.abi;
+                    return;
+                }
+            }
+        } catch (_) {
+            // ignore and fall back to inline ABI
+        }
+
+        // Fallback inline ABI (subset needed by the UI)
         this.contractABI = [
             {
                 "inputs": [
@@ -105,28 +120,21 @@ class ChildWelfareApp {
             {
                 "inputs": [],
                 "name": "getAllRecords",
-                "outputs": [
-                    {
-                        "components": [
-                            {"internalType": "uint256", "name": "id", "type": "uint256"},
-                            {"internalType": "string", "name": "name", "type": "string"},
-                            {"internalType": "uint256", "name": "age", "type": "uint256"},
-                            {"internalType": "string", "name": "healthStatus", "type": "string"},
-                            {"internalType": "string", "name": "location", "type": "string"},
-                            {"internalType": "string", "name": "guardian", "type": "string"},
-                            {"internalType": "string", "name": "status", "type": "string"},
-                            {"internalType": "uint256", "name": "createdAt", "type": "uint256"},
-                            {"internalType": "uint256", "name": "lastUpdatedAt", "type": "uint256"},
-                            {"internalType": "address", "name": "createdBy", "type": "address"},
-                            {"internalType": "address", "name": "lastUpdatedBy", "type": "address"},
-                            {"internalType": "bool", "name": "isActive", "type": "bool"},
-                            {"internalType": "string", "name": "metadata", "type": "string"}
-                        ],
-                        "internalType": "struct ChildWelfare.ChildRecord[]",
-                        "name": "",
-                        "type": "tuple[]"
-                    }
-                ],
+                "outputs": [{"internalType": "tuple[]","name": "","type": "tuple[]","components": [
+                    {"internalType":"uint256","name":"id","type":"uint256"},
+                    {"internalType":"string","name":"name","type":"string"},
+                    {"internalType":"uint256","name":"age","type":"uint256"},
+                    {"internalType":"string","name":"healthStatus","type":"string"},
+                    {"internalType":"string","name":"location","type":"string"},
+                    {"internalType":"string","name":"guardian","type":"string"},
+                    {"internalType":"string","name":"status","type":"string"},
+                    {"internalType":"uint256","name":"createdAt","type":"uint256"},
+                    {"internalType":"uint256","name":"lastUpdatedAt","type":"uint256"},
+                    {"internalType":"address","name":"createdBy","type":"address"},
+                    {"internalType":"address","name":"lastUpdatedBy","type":"address"},
+                    {"internalType":"bool","name":"isActive","type":"bool"},
+                    {"internalType":"string","name":"metadata","type":"string"}
+                ]}],
                 "stateMutability": "view",
                 "type": "function"
             },
@@ -338,7 +346,24 @@ class ChildWelfareApp {
                 gas: gasEstimate
             });
 
-            this.showMessage(`Record created successfully! Record ID: ${result.events.RecordCreated.returnValues.recordId}`, 'success');
+            // Safely extract recordId from receipt events; fallback to contract counter
+            let recordId = 'unknown';
+            try {
+                if (result && result.events) {
+                    const ev = result.events.RecordCreated || result.events['RecordCreated'];
+                    if (ev && ev.returnValues && ev.returnValues.recordId !== undefined) {
+                        recordId = parseInt(ev.returnValues.recordId);
+                    }
+                }
+                if (recordId === 'unknown') {
+                    const count = await this.contract.methods.recordCount().call();
+                    recordId = parseInt(count);
+                }
+            } catch (e) {
+                // keep 'unknown' if both methods fail
+            }
+
+            this.showMessage(`Record created successfully! Record ID: ${recordId}`, 'success');
             
             // Clear form
             document.getElementById('childName').value = '';
@@ -650,4 +675,45 @@ function loadActiveRecords() {
 
 function switchTab(tabName) {
     app.switchTab(tabName);
+}
+
+// Health status update (Hospital-only convenience wrapper)
+async function updateHealthStatus() {
+    if (!app.contract || !app.account) {
+        app.showMessage('Please connect to Web3 first', 'error');
+        return;
+    }
+
+    try {
+        const recordId = parseInt(document.getElementById('healthRecordId').value);
+        const newValue = document.getElementById('healthUpdateValue').value;
+        const reason = document.getElementById('healthUpdateReason').value;
+
+        if (!recordId || !newValue || !reason) {
+            app.showMessage('Please fill in all fields', 'error');
+            return;
+        }
+
+        app.showMessage('Updating health status... Please wait for transaction confirmation.', 'info');
+
+        // Estimate gas
+        const gasEstimate = await app.contract.methods.updateRecord(
+            recordId, 'healthStatus', newValue, reason
+        ).estimateGas({ from: app.account });
+
+        // Send tx
+        await app.contract.methods.updateRecord(
+            recordId, 'healthStatus', newValue, reason
+        ).send({ from: app.account, gas: gasEstimate });
+
+        app.showMessage('Health status updated successfully!', 'success');
+
+        // Clear
+        document.getElementById('healthRecordId').value = '';
+        document.getElementById('healthUpdateValue').value = '';
+        document.getElementById('healthUpdateReason').value = '';
+    } catch (error) {
+        console.error('Health status update error:', error);
+        app.showMessage(`Failed to update health status: ${error.message}`, 'error');
+    }
 }

@@ -333,6 +333,7 @@
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('create')">Create Record</div>
                 <div class="tab" onclick="switchTab('update')">Update Record</div>
+                <div class="tab" onclick="switchTab('health')">Update Health Status</div>
                 <div class="tab" onclick="switchTab('transfer')">Transfer Guardianship</div>
                 <div class="tab" onclick="switchTab('view')">View Records</div>
             </div>
@@ -414,6 +415,35 @@
                     </div>
                     
                     <button class="btn btn-warning" onclick="updateRecord()">Update Record</button>
+                </div>
+            </div>
+
+            <!-- Health Status Update Tab (Hospital only) -->
+            <div id="healthTab" class="tab-content">
+                <div class="connection-panel">
+                    <h3>🏥 Update Health Status (Hospital)</h3>
+                    <div class="form-group">
+                        <label for="healthRecordId">Record ID:</label>
+                        <input type="number" id="healthRecordId" placeholder="Enter record ID">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="healthUpdateValue">New Health Status:</label>
+                        <select id="healthUpdateValue">
+                            <option value="">Select health status</option>
+                            <option value="healthy">Healthy</option>
+                            <option value="minor_issues">Minor Issues</option>
+                            <option value="medical_attention">Needs Medical Attention</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="healthUpdateReason">Reason for Update:</label>
+                        <input type="text" id="healthUpdateReason" placeholder="Enter reason for update">
+                    </div>
+
+                    <button class="btn btn-warning" onclick="updateHealthStatus()">Update Health Status</button>
                 </div>
             </div>
 

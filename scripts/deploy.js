@@ -18,31 +18,38 @@ async function main() {
   console.log(`🔗 Network: ${hre.network.name}`);
   console.log(`⛽ Gas Used: ${childWelfare.deployTransaction.gasLimit.toString()}`);
 
-  // Get deployer information
-  const [deployer] = await hre.ethers.getSigners();
-  console.log(`👤 Deployer: ${deployer.address}`);
-  console.log(`💰 Deployer Balance: ${hre.ethers.utils.formatEther(await deployer.getBalance())} ETH`);
+  // Get signers and assign exactly one account per role
+  const signers = await hre.ethers.getSigners();
+  const admin = signers[0];
+  const ngo = signers[1];
+  const government = signers[2];
+  const hospital = signers[3];
+  const auditor = signers[4];
 
-  // Grant initial roles to deployer
-  console.log("🔐 Setting up initial roles...");
+  console.log(`👤 Admin:       ${admin.address}`);
+  console.log(`👤 NGO:         ${ngo.address}`);
+  console.log(`👤 Government:  ${government.address}`);
+  console.log(`👤 Hospital:    ${hospital.address}`);
+  console.log(`👤 Auditor:     ${auditor.address}`);
+
+  console.log("🔐 Setting up single-account roles...");
   
   const NGO_ROLE = hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("NGO_ROLE"));
   const GOVERNMENT_ROLE = hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("GOVERNMENT_ROLE"));
   const HOSPITAL_ROLE = hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("HOSPITAL_ROLE"));
   const AUDITOR_ROLE = hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("AUDITOR_ROLE"));
 
-  // Grant all roles to deployer for testing
-  await childWelfare.grantRole(NGO_ROLE, deployer.address);
-  await childWelfare.grantRole(GOVERNMENT_ROLE, deployer.address);
-  await childWelfare.grantRole(HOSPITAL_ROLE, deployer.address);
-  await childWelfare.grantRole(AUDITOR_ROLE, deployer.address);
+  await childWelfare.grantRole(NGO_ROLE, ngo.address);
+  await childWelfare.grantRole(GOVERNMENT_ROLE, government.address);
+  await childWelfare.grantRole(HOSPITAL_ROLE, hospital.address);
+  await childWelfare.grantRole(AUDITOR_ROLE, auditor.address);
 
-  console.log("✅ Initial roles granted to deployer");
+  console.log("✅ Roles granted to unique accounts");
 
-  // Create a test record
-  console.log("📝 Creating test record...");
+  // Create a test record using NGO account (role-restricted)
+  console.log("📝 Creating test record (NGO)...");
   
-  const tx = await childWelfare.createRecord(
+  const tx = await childWelfare.connect(ngo).createRecord(
     "Test Child",
     10,
     "healthy",
@@ -62,7 +69,14 @@ async function main() {
   const deploymentInfo = {
     contractAddress: childWelfare.address,
     network: hre.network.name,
-    deployer: deployer.address,
+    deployer: admin.address,
+    rolesMapping: {
+      admin: admin.address,
+      ngo: ngo.address,
+      government: government.address,
+      hospital: hospital.address,
+      auditor: auditor.address
+    },
     deploymentTime: new Date().toISOString(),
     recordCount: recordCount.toString(),
     roles: {

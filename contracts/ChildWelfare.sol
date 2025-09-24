@@ -170,7 +170,7 @@ contract ChildWelfare is AccessControl, ReentrancyGuard, Pausable {
             oldValue = _uintToString(record.age);
             record.age = newAge;
         } else if (keccak256(bytes(_field)) == keccak256(bytes("healthStatus"))) {
-            require(hasRole(HOSPITAL_ROLE, msg.sender) || hasRole(NGO_ROLE, msg.sender), "Insufficient permissions for health update");
+            require(hasRole(HOSPITAL_ROLE, msg.sender), "Insufficient permissions for health update");
             oldValue = record.healthStatus;
             record.healthStatus = _newValue;
         } else if (keccak256(bytes(_field)) == keccak256(bytes("location"))) {
