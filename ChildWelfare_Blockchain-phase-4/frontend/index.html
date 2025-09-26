@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Welfare Blockchain - Smart Contract Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.2.0/dist/web3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .connection-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .connection-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .records-section {
+            margin-top: 30px;
+        }
+
+        .records-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .record-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #27ae60;
+            transition: transform 0.3s ease;
+        }
+
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .record-id {
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .record-status {
+            background: #27ae60;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .record-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .record-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Blockchain visualization */
+        .chain-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #8e44ad;
+        }
+
+        .chain-toolbar {
+            margin-bottom: 15px;
+        }
+
+        .chain-container {
+            overflow-x: auto;
+            padding-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .block-item {
+            display: inline-block;
+            vertical-align: top;
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 12px;
+            margin-right: 20px;
+            min-width: 240px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .block-index {
+            background: #8e44ad;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .block-hash, .block-prevhash {
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 12px;
+            color: #34495e;
+            word-break: break-all;
+        }
+
+        .arrow {
+            display: inline-block;
+            vertical-align: middle;
+            color: #8e44ad;
+            margin-right: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Child Welfare Blockchain</h1>
+            <p>Smart Contract Interface for Child Record Management</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Connection Panel -->
+            <div class="connection-panel">
+                <h3>🔗 Web3 Connection</h3>
+                <div id="connectionStatus" class="status disconnected">
+                    Not connected to Ethereum network
+                </div>
+                
+                <div class="form-group">
+                    <label for="providerUrl">Provider URL:</label>
+                    <input type="text" id="providerUrl" value="http://localhost:8545" placeholder="Ethereum node URL">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contractAddress">Contract Address:</label>
+                    <input type="text" id="contractAddress" placeholder="Deployed contract address">
+                </div>
+                
+                <div class="form-group">
+                    <label for="privateKey">Private Key (for transactions):</label>
+                    <input type="password" id="privateKey" placeholder="Enter private key (0x...)">
+                </div>
+                
+                <button class="btn" onclick="connectWeb3()">Connect to Web3</button>
+                <button class="btn btn-success" onclick="loadRecords()">Load Records</button>
+            </div>
+
+            <!-- Network Info -->
+            <div id="networkInfo" style="display: none;">
+                <div class="connection-panel">
+                    <h3>📊 Network Information</h3>
+                    <div id="networkDetails"></div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('create')">Create Record</div>
+                <div class="tab" onclick="switchTab('update')">Update Record</div>
+                <div class="tab" onclick="switchTab('health')">Update Health Status</div>
+                <div class="tab" onclick="switchTab('transfer')">Transfer Guardianship</div>
+                <div class="tab" onclick="switchTab('view')">View Records</div>
+                <div class="tab" onclick="switchTab('chain')">Blockchain</div>
+            </div>
+
+            <!-- Create Record Tab -->
+            <div id="createTab" class="tab-content active">
+                <div class="connection-panel">
+                    <h3>📝 Create New Child Record</h3>
+                    <div class="form-group">
+                        <label for="childName">Child Name:</label>
+                        <input type="text" id="childName" placeholder="Enter child's full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="childAge">Age:</label>
+                        <input type="number" id="childAge" min="0" max="18" placeholder="Enter age">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="healthStatus">Health Status:</label>
+                        <select id="healthStatus">
+                            <option value="">Select health status</option>
+                            <option value="healthy">Healthy</option>
+                            <option value="minor_issues">Minor Issues</option>
+                            <option value="medical_attention">Needs Medical Attention</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" placeholder="Enter current location">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="guardian">Guardian:</label>
+                        <input type="text" id="guardian" placeholder="Enter guardian name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="metadata">Additional Information:</label>
+                        <textarea id="metadata" rows="3" placeholder="Any additional information (optional)"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="createRecord()">Create Record</button>
+                </div>
+            </div>
+
+            <!-- Update Record Tab -->
+            <div id="updateTab" class="tab-content">
+                <div class="connection-panel">
+                    <h3>✏️ Update Child Record</h3>
+                    <div class="form-group">
+                        <label for="updateRecordId">Record ID:</label>
+                        <input type="number" id="updateRecordId" placeholder="Enter record ID to update">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateField">Field to Update:</label>
+                        <select id="updateField">
+                            <option value="">Select field</option>
+                            <option value="name">Name</option>
+                            <option value="age">Age</option>
+                            <option value="healthStatus">Health Status</option>
+                            <option value="location">Location</option>
+                            <option value="status">Status</option>
+                            <option value="metadata">Additional Information</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateValue">New Value:</label>
+                        <input type="text" id="updateValue" placeholder="Enter new value">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateReason">Reason for Update:</label>
+                        <input type="text" id="updateReason" placeholder="Enter reason for update">
+                    </div>
+                    
+                    <button class="btn btn-warning" onclick="updateRecord()">Update Record</button>
+                </div>
+            </div>
+
+            <!-- Health Status Update Tab (Hospital only) -->
+            <div id="healthTab" class="tab-content">
+                <div class="connection-panel">
+                    <h3>🏥 Update Health Status (Hospital)</h3>
+                    <div class="form-group">
+                        <label for="healthRecordId">Record ID:</label>
+                        <input type="number" id="healthRecordId" placeholder="Enter record ID">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="healthUpdateValue">New Health Status:</label>
+                        <select id="healthUpdateValue">
+                            <option value="">Select health status</option>
+                            <option value="healthy">Healthy</option>
+                            <option value="minor_issues">Minor Issues</option>
+                            <option value="medical_attention">Needs Medical Attention</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="healthUpdateReason">Reason for Update:</label>
+                        <input type="text" id="healthUpdateReason" placeholder="Enter reason for update">
+                    </div>
+
+                    <button class="btn btn-warning" onclick="updateHealthStatus()">Update Health Status</button>
+                </div>
+            </div>
+
+            <!-- Transfer Guardianship Tab -->
+            <div id="transferTab" class="tab-content">
+                <div class="connection-panel">
+                    <h3>🔄 Transfer Guardianship</h3>
+                    <div class="form-group">
+                        <label for="transferRecordId">Record ID:</label>
+                        <input type="number" id="transferRecordId" placeholder="Enter record ID">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newGuardian">New Guardian:</label>
+                        <input type="text" id="newGuardian" placeholder="Enter new guardian name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transferReason">Transfer Reason:</label>
+                        <input type="text" id="transferReason" placeholder="Enter reason for transfer">
+                    </div>
+                    
+                    <button class="btn btn-warning" onclick="transferGuardianship()">Transfer Guardianship</button>
+                </div>
+            </div>
+
+            <!-- View Records Tab -->
+            <div id="viewTab" class="tab-content">
+                <div class="records-section">
+                    <h3>📋 Child Records</h3>
+                    <button class="btn" onclick="loadRecords()">Refresh Records</button>
+                    <button class="btn btn-success" onclick="loadActiveRecords()">Load Active Records Only</button>
+                    
+                    <div id="recordsList">
+                        <div class="loading">Click "Load Records" to view child records</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blockchain Visualization Tab -->
+            <div id="chainTab" class="tab-content">
+                <div class="chain-panel">
+                    <h3>🔗 Blockchain</h3>
+                    <div class="chain-toolbar">
+                        <label for="backendUrl" style="font-weight:600;color:#34495e;">Backend URL:</label>
+                        <input type="text" id="backendUrl" value="http://127.0.0.1:3001" style="width:300px;margin-right:10px;padding:8px;border:2px solid #e1e8ed;border-radius:8px;" />
+                        <button class="btn" onclick="loadChain()">Refresh Chain</button>
+                    </div>
+                    <div id="chainContainer" class="chain-container">
+                        <div class="loading">Click "Refresh Chain" to fetch blocks</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="messages"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

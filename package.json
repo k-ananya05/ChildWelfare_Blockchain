@@ -1,0 +1,19 @@
+{
+  "name": "child-welfare-blockchain",
+  "version": "1.0.0",
+  "description": "Child Welfare Blockchain Smart Contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "serve": "npx http-server frontend -p 3000"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.4"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.1"
+  }
+}

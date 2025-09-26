@@ -1,0 +1,5 @@
+- [x] Add modifier onlyAnyRole to ChildWelfare.sol
+- [x] Replace onlyAuditor with onlyAnyRole in getRecord function
+- [x] Replace onlyAuditor with onlyAnyRole in getAllRecords function
+- [x] Replace onlyAuditor with onlyAnyRole in getActiveRecords function
+- [x] Compile the contract to verify changes

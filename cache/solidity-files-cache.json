@@ -1,0 +1,77 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\rvaru\\Downloads\\ChildWelfare_Blockchain-phase-4\\contracts\\ChildWelfare.sol": {
+      "lastModificationDate": 1758816690376,
+      "contentHash": "642d09eaec0d0c503591a669a1b4cbfd",
+      "sourceName": "contracts/ChildWelfare.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "ChildWelfare"
+      ]
+    },
+    "D:\\ChildWelfare_Blockchain-phase-4\\contracts\\ChildWelfare.sol": {
+      "lastModificationDate": 1758828932198,
+      "contentHash": "2e450366deec1a7eb8b4466f3921bca9",
+      "sourceName": "contracts/ChildWelfare.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "ChildWelfare"
+      ]
+    }
+  }
+}
